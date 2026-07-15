@@ -22,7 +22,8 @@ jobs:
     - name: Unzip Source File
       run: |
         unzip -o plugin.zip
-        ls -R src/
+        # যদি জিপের ভেতর অন্য কোনো ফোল্ডারের আড়ালে src থাকে, তা মেইন স্ক্রিনে নিয়ে আসবে
+        find . -type d -name "src" -exec mv {}/. ./src \; 2>/dev/null || true
       
     - name: Build with Gradle
       run: gradle jar
