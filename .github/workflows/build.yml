@@ -19,13 +19,19 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
       
-    - name: Unzip Source File
+    - name: Unzip and Fix Folder Structure
       run: |
+        # জিপ ফাইলটি আনজিপ করা হচ্ছে
         unzip -o plugin.zip
-        # যদি জিপের ভেতর অন্য কোনো ফোল্ডারের আড়ালে src থাকে, তা মেইন স্ক্রিনে নিয়ে আসবে
-        find . -type d -name "src" -exec mv {}/. ./src \; 2>/dev/null || true
+        
+        # যদি src ফোল্ডারটি অন্য কোনো সাব-ফোল্ডারের ভেতরে থাকে, তা খুঁজে মেইন স্ক্রিনে আনা হচ্ছে
+        EXTRACTED_SRC=$(find . -type d -name "src" | head -n 1)
+        if [ "$EXTRACTED_SRC" != "./src" ] && [ ! -z "$EXTRACTED_SRC" ]; then
+          echo "Moving src from $EXTRACTED_SRC to root"
+          mv "$EXTRACTED_SRC" ./src
+        fi
       
-    - name: Build with Gradle
+    - name: Build Jar File
       run: gradle jar
       
     - name: Upload Artifact
