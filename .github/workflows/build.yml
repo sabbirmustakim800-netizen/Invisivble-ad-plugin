@@ -20,10 +20,12 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
       
     - name: Unzip Source File
-      run: unzip plugin.zip
+      run: |
+        unzip -o plugin.zip
+        ls -R src/
       
     - name: Build with Gradle
-      run: gradle build
+      run: gradle jar
       
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
