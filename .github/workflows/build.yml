@@ -19,20 +19,21 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
       
-    - name: Unzip and Fix Folder Structure
+    - name: Unzip and Smart Locate Source
       run: |
-        # জিপ ফাইলটি আনজিপ করা হচ্ছে
+        # জিপ ফাইল আনজিপ করা হচ্ছে
         unzip -o plugin.zip
         
-        # যদি src ফোল্ডারটি অন্য কোনো সাব-ফোল্ডারের ভেতরে থাকে, তা খুঁজে মেইন স্ক্রিনে আনা হচ্ছে
-        EXTRACTED_SRC=$(find . -type d -name "src" | head -n 1)
-        if [ "$EXTRACTED_SRC" != "./src" ] && [ ! -z "$EXTRACTED_SRC" ]; then
-          echo "Moving src from $EXTRACTED_SRC to root"
-          mv "$EXTRACTED_SRC" ./src
+        # নিখুঁতভাবে src ফোল্ডারটি খুঁজে বের করে মেইন স্ক্রিনে বসানো হচ্ছে
+        # এতে ভেতরে যত নামেরই ফোল্ডার থাকুক, কোনো এরর আসবে না
+        SRC_DIR=$(find . -type d -name "src" | head -n 1)
+        if [ "$SRC_DIR" != "./src" ] && [ ! -z "$SRC_DIR" ]; then
+          echo "Found src at $SRC_DIR. Moving to root..."
+          mv "$SRC_DIR" ./src
         fi
       
-    - name: Build Jar File
-      run: gradle jar
+    - name: Build with Gradle
+      run: gradle jar --no-daemon
       
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
